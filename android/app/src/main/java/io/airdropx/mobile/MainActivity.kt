@@ -31,7 +31,7 @@ class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var wifi: WifiP2pManager
     private lateinit var channel: WifiP2pManager.Channel
-    private val found = linkedSetOf<String>()
+    private val found = linkedMapOf<String, String>()
     private var receiving = false
     private var receiveTree: Uri? = null
 
@@ -39,8 +39,8 @@ class MainActivity : Activity() {
         @SuppressLint("MissingPermission")
         override fun onScanResult(type: Int, result: ScanResult) {
             val name = result.scanRecord?.deviceName ?: result.device.name ?: "AirDrop-X Windows"
-            found += "$name  ${result.rssi} dBm"
-            runOnUiThread { devices.text = found.joinToString("\n") }
+            found[result.device.address] = "$name  ${result.rssi} dBm"
+            runOnUiThread { devices.text = found.values.joinToString("\n") }
         }
 
         override fun onScanFailed(code: Int) = show("BLE 扫描失败：$code")
