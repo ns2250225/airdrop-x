@@ -21,6 +21,7 @@ $('#scan').onclick = async () => {
       radio.type = 'radio'
       radio.name = 'device'
       radio.value = address
+      radio.dataset.deviceName = name
       const signal = document.createElement('small')
       signal.textContent = `${rssi} dBm`
       label.append(radio, document.createTextNode(name), signal)
@@ -34,9 +35,17 @@ $('#scan').onclick = async () => {
 }
 
 $('#connect').onclick = async () => {
+  const selected = document.querySelector('input[name="device"]:checked')
+  if (!selected) {
+    status('请先选择要连接的 Android 设备', true)
+    return
+  }
   status('正在建立 Wi‑Fi Direct 连接…')
   try {
-    const address = await invoke('connect_wifi_direct')
+    const address = await invoke('connect_wifi_direct', {
+      targetName: selected.dataset.deviceName,
+      targetAddress: selected.value,
+    })
     $('#address').value = address
     $('#send').disabled = false
     status(`已直连：${address}`)
