@@ -130,8 +130,19 @@ class MainActivity : Activity() {
                 show("直连网络已就绪，等待 Windows 连接…")
                 if (!receiving) receive()
             }
-            override fun onFailure(reason: Int) = show("Wi‑Fi Direct 建组失败：$reason")
+            override fun onFailure(reason: Int) = show(wifiDirectFailure(reason))
         })
+    }
+
+    private fun wifiDirectFailure(reason: Int) = when (reason) {
+        WifiP2pManager.ERROR ->
+            "Wi‑Fi Direct 建组失败：系统内部错误。请确认 Wi‑Fi 已开启、附近设备权限已授予，然后关闭并重新打开 Wi‑Fi 后重试（错误码 0）"
+        WifiP2pManager.P2P_UNSUPPORTED ->
+            "Wi‑Fi Direct 建组失败：此手机或当前系统不支持 Wi‑Fi Direct（错误码 1）"
+        WifiP2pManager.BUSY ->
+            "Wi‑Fi Direct 建组失败：系统正忙，可能已有直连网络或正在连接其他设备。请稍等后重试，必要时断开现有 Wi‑Fi Direct 连接（错误码 2）"
+        else ->
+            "Wi‑Fi Direct 建组失败：系统返回了未知错误，请重启 Wi‑Fi 后重试（错误码 $reason）"
     }
 
     private fun chooseFile() = startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
